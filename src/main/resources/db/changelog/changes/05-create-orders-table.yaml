@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-orders-table
+      author: rostyslav_kuzmych
+      changes:
+        - createTable:
+            tableName: orders
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+              - column:
+                  name: car_id
+                  type: bigint
+                  constraints:
+                    foreignKeyName: fk_orders_car_id
+                    references: cars(id)
+                    nullable: false
+              - column:
+                  name: problem_description
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: date_of_acceptance
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: final_amount
+                  type: decimal
+                  defaultValue: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end_date
+                  type: timestamp
+              - column:
+                  name: is_deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
