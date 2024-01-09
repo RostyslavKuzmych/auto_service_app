@@ -16,8 +16,6 @@ import application.repository.OwnerRepository;
 import application.service.OwnerService;
 import jakarta.transaction.Transactional;
 import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +75,7 @@ public class OwnerServiceImpl implements OwnerService {
                 owner.getOrders().add(order);
                 ownerRepository.save(owner);
             }
-    });
+        });
     }
 
     private Owner findByIdWithCars(Long ownerId) {

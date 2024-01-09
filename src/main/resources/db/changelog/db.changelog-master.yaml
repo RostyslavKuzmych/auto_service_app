@@ -25,4 +25,3 @@ databaseChangeLog:
       file: db/changelog/changes/12-add-goods-to-goods-table.yml
   - include:
       file: db/changelog/changes/13-add-masters-to-masters-table.yml
-
