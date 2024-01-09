@@ -21,6 +21,6 @@ public interface OwnerRepository extends JpaRepository<Owner, Long> {
     Optional<Owner> findByCarId(Long id);
 
     @Query("SELECT owner FROM Owner owner JOIN FETCH owner.orders o "
-            + "JOIN FETCH owner.cars c WHERE o.id = :id")
+            + "WHERE o.id = :id")
     Optional<Owner> findByOrderId(Long id);
 }

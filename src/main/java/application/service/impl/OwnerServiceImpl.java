@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class OwnerServiceImpl implements OwnerService {
     private static final String EXCEPTION = "Can't find owner by id ";
+    private static final String EXCEPTION_ORDER = "Can't find owner by order id ";
     private static final String EXCEPTION_CAR = "Can't find car by id ";
     private final OwnerRepository ownerRepository;
     private final OwnerMapper ownerMapper;
@@ -68,7 +69,8 @@ public class OwnerServiceImpl implements OwnerService {
     private void checkIfOwnerHasOrders(Long id, List<Order> orders) {
         Owner owner = findByIdWithOrders(id);
         orders.stream().forEach(order -> {
-            Owner ownerFromDb = ownerRepository.findByOrderId(order.getId()).get();
+            Owner ownerFromDb = ownerRepository.findByOrderId(order.getId())
+                    .orElseThrow(() -> new EntityNotFoundException(EXCEPTION_ORDER + id));
             if (ownerFromDb.getId() != id) {
                 ownerFromDb.getOrders().remove(order);
                 ownerRepository.save(ownerFromDb);
