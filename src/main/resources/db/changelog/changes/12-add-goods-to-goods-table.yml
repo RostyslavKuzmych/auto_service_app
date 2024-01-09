@@ -1,0 +1,32 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-goods-to-goods-table
+      author: rostyslav_kuzmych
+      changes:
+        - insert:
+            tableName: goods
+            columns:
+              - column:
+                  name: name
+                  value: "vacuum cleaner"
+              - column:
+                  name: price
+                  value: 1200.0
+        - insert:
+            tableName: goods
+            columns:
+              - column:
+                  name: name
+                  value: "inverter"
+              - column:
+                  name: price
+                  value: 1500.0
+        - insert:
+            tableName: goods
+            columns:
+              - column:
+                  name: name
+                  value: "organizer"
+              - column:
+                  name: price
+                  value: 1800.0

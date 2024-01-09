@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-owners-to-owners-table
+      author: rostyslav_kuzmych
+      changes:
+        - insert:
+            tableName: owners
+            columns:
+              - column:
+                  name: id
+                  value: 1
+        - insert:
+            tableName: owners
+            columns:
+              - column:
+                  name: id
+                  value: 2
+        - insert:
+            tableName: owners
+            columns:
+              - column:
+                  name: id
+                  value: 3

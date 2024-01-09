@@ -40,7 +40,7 @@ public class MasterController {
             description = "Endpoint for updating a master by id")
     @ResponseStatus(HttpStatus.OK)
     public MasterResponseDto updateMaster(@PathVariable Long id,
-                                          @RequestBody
+                                          @Valid @RequestBody
                                           MasterRequestDto masterRequestDto) {
         return masterService.updateById(id, masterRequestDto);
     }

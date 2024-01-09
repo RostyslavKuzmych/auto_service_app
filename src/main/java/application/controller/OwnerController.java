@@ -3,9 +3,11 @@ package application.controller;
 import application.dto.order.OrderResponseDto;
 import application.dto.owner.OwnerRequestDto;
 import application.dto.owner.OwnerResponseDto;
+import application.dto.owner.OwnerResponseDtoWithCars;
 import application.service.OwnerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,7 +37,8 @@ public class OwnerController {
     @PutMapping("/{id}")
     @Operation(summary = "Update an owner", description = "Endpoint for updating owner by id")
     @ResponseStatus(HttpStatus.OK)
-    public OwnerResponseDto updateOwnerById(@PathVariable Long id,
+    public OwnerResponseDtoWithCars updateOwnerById(@PathVariable Long id,
+                                                    @Valid
                                             @RequestBody OwnerRequestDto ownerRequestDto) {
         return ownerService.updateOwnerByid(id, ownerRequestDto);
     }

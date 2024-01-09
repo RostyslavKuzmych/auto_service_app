@@ -7,5 +7,4 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class OrderRequestUpdateDto {
     private String problemDescription;
-    private Long carId;
 }

@@ -11,6 +11,7 @@ import application.model.Master;
 import application.repository.JobRepository;
 import application.repository.MasterRepository;
 import application.service.MasterService;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -34,9 +35,12 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     public MasterResponseDto updateById(Long id, MasterRequestDto masterRequestDto) {
-        checkIfMasterExists(id);
-        Master master = masterMapper.toEntity(masterRequestDto).setId(id);
-        return masterMapper.toDto(masterRepository.save(master));
+        Master master = masterRepository.findById(id).orElseThrow(()
+                -> new EntityNotFoundException(EXCEPTION + id));
+        master.setFirstName(masterRequestDto.getFirstName());
+        master.setLastName(masterRequestDto.getLastName());
+        masterRepository.save(master);
+        return masterMapper.toDto(master);
     }
 
     @Override
@@ -46,20 +50,17 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
+    @Transactional
     public BigDecimal getSalaryByMasterId(Long id) {
         Master master = findByIdWithAllOrders(id);
         BigDecimal salary = master.getOrders().stream()
                 .flatMap(order -> order.getJobs().stream())
                 .filter(job -> Objects.equals(job.getMaster().getId(), master.getId()))
+                .filter(job -> job.getStatus() == Job.Status.UNPAID)
                 .map(job -> jobRepository.save(job.setStatus(Job.Status.PAID)))
                 .map(Job::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return salary.multiply(BigDecimal.valueOf(0.4));
-    }
-
-    private void checkIfMasterExists(Long id) {
-        Master master = masterRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(EXCEPTION + id));
     }
 
     private Master findByIdWithAllOrders(Long id) {

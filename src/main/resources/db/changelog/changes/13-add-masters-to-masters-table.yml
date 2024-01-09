@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-masters-to-masters-table
+      author: rostyslav_kuzmych
+      changes:
+        - insert:
+            tableName: masters
+            columns:
+              - column:
+                  name: first_name
+                  value: "Stepan"
+              - column:
+                  name: last_name
+                  value: "Kos"
+        - insert:
+            tableName: masters
+            columns:
+              - column:
+                  name: first_name
+                  value: "Yuri"
+              - column:
+                  name: last_name
+                  value: "Shevchenko"

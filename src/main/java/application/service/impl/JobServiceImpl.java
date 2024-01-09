@@ -1,10 +1,13 @@
 package application.service.impl;
 
 import application.dto.job.JobRequestDto;
+import application.dto.job.JobRequestStatusDto;
 import application.dto.job.JobResponseDto;
 import application.exception.EntityNotFoundException;
 import application.mapper.JobMapper;
 import application.model.Job;
+import application.model.Master;
+import application.model.Order;
 import application.repository.JobRepository;
 import application.service.JobService;
 import lombok.RequiredArgsConstructor;
@@ -25,20 +28,20 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobResponseDto updateJob(Long id, JobRequestDto jobRequestDto) {
-        checkIfJobExists(id);
-        Job job = jobMapper.toEntity(jobRequestDto).setId(id);
+        Job job = findById(id)
+                .setMaster(new Master().setId(jobRequestDto.getMasterId()))
+                .setOrder(new Order().setId(jobRequestDto.getOrderId()));
         return jobMapper.toDto(jobRepository.save(job));
     }
 
     @Override
-    public JobResponseDto updateJobStatus(Long id, Job.Status status) {
-        checkIfJobExists(id);
-        Job job = jobRepository.findById(id).get().setStatus(status);
+    public JobResponseDto updateJobStatus(Long id, JobRequestStatusDto status) {
+        Job job = findById(id).setStatus(status.getStatus());
         return jobMapper.toDto(jobRepository.save(job));
     }
 
-    private void checkIfJobExists(Long id) {
-        Job job = jobRepository.findById(id).orElseThrow(()
+    private Job findById(Long id) {
+        return jobRepository.findById(id).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION + id));
     }
 }

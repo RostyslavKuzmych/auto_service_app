@@ -6,7 +6,6 @@ import application.dto.order.OrderResponseDto;
 import application.model.Good;
 import application.model.Job;
 import application.model.Order;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
@@ -24,7 +23,7 @@ public interface OrderMapper {
     Order toEntity(OrderRequestDto orderRequestDto);
 
     @Named(value = "getJobsId")
-    default Set<Long> getJobsId(List<Job> jobs) {
+    default Set<Long> getJobsId(Set<Job> jobs) {
         return jobs.stream()
                 .map(Job::getId)
                 .collect(Collectors.toSet());

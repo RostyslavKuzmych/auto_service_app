@@ -1,8 +1,8 @@
 package application.controller;
 
 import application.dto.job.JobRequestDto;
+import application.dto.job.JobRequestStatusDto;
 import application.dto.job.JobResponseDto;
-import application.model.Job;
 import application.service.JobService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -36,7 +36,7 @@ public class JobController {
     @Operation(summary = "Update a job", description = "Endpoint for updating a job")
     @ResponseStatus(HttpStatus.OK)
     public JobResponseDto updateJob(@PathVariable Long id,
-                                    @RequestBody JobRequestDto jobRequestDto) {
+                                    @Valid @RequestBody JobRequestDto jobRequestDto) {
         return jobService.updateJob(id, jobRequestDto);
     }
 
@@ -45,7 +45,8 @@ public class JobController {
             description = "Endpoint for updating a job status")
     @ResponseStatus(HttpStatus.OK)
     public JobResponseDto updateJobStatus(@PathVariable Long id,
-                                          @RequestBody Job.Status status) {
+                                          @Valid @RequestBody
+                                          JobRequestStatusDto status) {
         return jobService.updateJobStatus(id, status);
     }
 }

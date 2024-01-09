@@ -1,8 +1,8 @@
 package application.mapper;
 
 import application.config.MapperConfig;
-import application.dto.owner.OwnerRequestDto;
 import application.dto.owner.OwnerResponseDto;
+import application.dto.owner.OwnerResponseDtoWithCars;
 import application.model.Car;
 import application.model.Owner;
 import java.util.Set;
@@ -15,11 +15,11 @@ import org.mapstruct.Named;
 public interface OwnerMapper {
     OwnerResponseDto toDto(Owner owner);
 
-    @Mapping(source = "carsId", target = "cars", qualifiedByName = "getCarsByIds")
-    Owner toEntity(OwnerRequestDto ownerRequestDto);
+    @Mapping(target = "carsId", source = "cars", qualifiedByName = "getCarsIdByCars")
+    OwnerResponseDtoWithCars toDtoWithCars(Owner owner);
 
-    @Named("getCarsByIds")
-    default Set<Car> getCarsByIds(Set<Long> carsId) {
-        return carsId.stream().map(id -> new Car().setId(id)).collect(Collectors.toSet());
+    @Named(value = "getCarsIdByCars")
+    default Set<Long> getCarsIdByCars(Set<Car> carSet) {
+        return carSet.stream().map(Car::getId).collect(Collectors.toSet());
     }
 }

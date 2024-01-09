@@ -34,7 +34,7 @@ public class CarController {
     @Operation(summary = "Update a car", description = "Endpoint for updating a car by id")
     @ResponseStatus(HttpStatus.OK)
     public CarResponseDto updateCarByid(@PathVariable Long id,
-                                        @RequestBody CarRequestDto requestDto) {
+                                        @Valid @RequestBody CarRequestDto requestDto) {
         return carService.updateCarById(id, requestDto);
     }
 }

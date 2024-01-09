@@ -1,9 +1,9 @@
 package application.controller;
 
 import application.dto.order.OrderRequestDto;
+import application.dto.order.OrderRequestStatusDto;
 import application.dto.order.OrderRequestUpdateDto;
 import application.dto.order.OrderResponseDto;
-import application.model.Order;
 import application.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -48,7 +48,7 @@ public class OrderController {
     @ResponseStatus(HttpStatus.OK)
     @Operation(summary = "Update an order",
             description = "Endpoint for updating an order by id")
-    public OrderResponseDto updateOrder(@RequestBody
+    public OrderResponseDto updateOrder(@RequestBody @Valid
                                             OrderRequestUpdateDto requestUpdateDto,
                                         @PathVariable Long orderId) {
         return orderService.updateOrder(requestUpdateDto, orderId);
@@ -59,7 +59,8 @@ public class OrderController {
     @Operation(summary = "Update an order status",
             description = "Endpoint for updating an order status")
     public OrderResponseDto updateOrderStatus(@PathVariable Long orderId,
-                                              @RequestBody Order.Status status) {
+                                              @Valid @RequestBody
+                                              OrderRequestStatusDto status) {
         return orderService.updateOrderStatus(orderId, status);
     }
 

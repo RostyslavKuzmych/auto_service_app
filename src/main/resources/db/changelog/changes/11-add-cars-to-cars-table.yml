@@ -1,0 +1,59 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-cars-to-cars-table
+      author: rostyslav_kuzmych
+      changes:
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: brand
+                  value: "audi"
+              - column:
+                  name: model
+                  value: A4
+              - column:
+                  name: manufacture_year
+                  value: 2012
+              - column:
+                  name: number
+                  value: "ca323"
+              - column:
+                  name: owner_id
+                  value: 1
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: brand
+                  value: "audi"
+              - column:
+                  name: model
+                  value: A5
+              - column:
+                  name: manufacture_year
+                  value: 2013
+              - column:
+                  name: number
+                  value: "gh233"
+              - column:
+                  name: owner_id
+                  value: 1
+        - insert:
+            tableName: cars
+            columns:
+              - column:
+                  name: brand
+                  value: "audi"
+              - column:
+                  name: model
+                  value: A6
+              - column:
+                  name: manufacture_year
+                  value: 2015
+              - column:
+                  name: number
+                  value: "fdh34"
+              - column:
+                  name: owner_id
+                  value: 2

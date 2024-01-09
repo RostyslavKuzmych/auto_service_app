@@ -17,3 +17,12 @@ databaseChangeLog:
       file: db/changelog/changes/08-create-orders_goods-table.yaml
   - include:
       file: db/changelog/changes/09-create-owners_orders-table.yaml
+  - include:
+      file: db/changelog/changes/10-add-owners-to-owners-table.yml
+  - include:
+      file: db/changelog/changes/11-add-cars-to-cars-table.yml
+  - include:
+      file: db/changelog/changes/12-add-goods-to-goods-table.yml
+  - include:
+      file: db/changelog/changes/13-add-masters-to-masters-table.yml
+

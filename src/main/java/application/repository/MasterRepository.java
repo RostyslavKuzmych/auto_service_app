@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MasterRepository extends JpaRepository<Master, Long> {
-    @Query("SELECT m FROM Master m JOIN FETCH m.orders o JOIN FETCH "
-            + "o.goods JOIN FETCH o.jobs "
+    @Query("SELECT m FROM Master m LEFT JOIN FETCH m.orders o LEFT JOIN FETCH "
+            + "o.goods LEFT JOIN FETCH o.jobs "
             + "WHERE m.id = :id")
     Optional<Master> findByIdWithAllOrders(Long id);
 }

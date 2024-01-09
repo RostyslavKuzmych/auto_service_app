@@ -22,7 +22,7 @@ import org.hibernate.annotations.SQLRestriction;
 @Accessors(chain = true)
 @Data
 @Table(name = "jobs")
-public class Job {
+public class Job implements Comparable<Job> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,6 +39,11 @@ public class Job {
     private Status status;
     @Column(nullable = false)
     private boolean isDeleted = false;
+
+    @Override
+    public int compareTo(Job o) {
+        return Long.compare(this.id, o.id);
+    }
 
     public enum Status {
         PAID,

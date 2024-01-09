@@ -1,9 +1,9 @@
 package application.service;
 
 import application.dto.order.OrderRequestDto;
+import application.dto.order.OrderRequestStatusDto;
 import application.dto.order.OrderRequestUpdateDto;
 import application.dto.order.OrderResponseDto;
-import application.model.Order;
 import java.math.BigDecimal;
 
 public interface OrderService {
@@ -13,7 +13,7 @@ public interface OrderService {
 
     OrderResponseDto updateOrder(OrderRequestUpdateDto requestUpdateDto, Long orderId);
 
-    OrderResponseDto updateOrderStatus(Long orderId, Order.Status status);
+    OrderResponseDto updateOrderStatus(Long orderId, OrderRequestStatusDto status);
 
     BigDecimal payForOrder(Long orderId, Long carId);
 }

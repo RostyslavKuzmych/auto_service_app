@@ -1,9 +1,11 @@
 package application.service.impl;
 
 import application.dto.order.OrderRequestDto;
+import application.dto.order.OrderRequestStatusDto;
 import application.dto.order.OrderRequestUpdateDto;
 import application.dto.order.OrderResponseDto;
 import application.exception.EntityNotFoundException;
+import application.exception.InvalidArgumentException;
 import application.mapper.OrderMapper;
 import application.model.Car;
 import application.model.Good;
@@ -17,6 +19,7 @@ import application.repository.MasterRepository;
 import application.repository.OrderRepository;
 import application.repository.OwnerRepository;
 import application.service.OrderService;
+import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -30,6 +33,7 @@ public class OrderServiceImpl implements OrderService {
     private static final String EXCEPTION_GOOD = "Can't find good by id ";
     private static final String EXCEPTION_ORDER = "Can't find order by id ";
     private static final String EXCEPTION_OWNER = "Can't find owner by car id ";
+    private static final String PAID_EXCEPTION = "This order is already paid!";
     private final OrderMapper orderMapper;
     private final OrderRepository orderRepository;
     private final OwnerRepository ownerRepository;
@@ -38,6 +42,7 @@ public class OrderServiceImpl implements OrderService {
     private final JobRepository jobRepository;
 
     @Override
+    @Transactional
     public OrderResponseDto placeOrder(Long carId, OrderRequestDto orderRequestDto) {
         Order order = orderMapper.toEntity(orderRequestDto)
                 .setDateOfAcceptance(LocalDateTime.now())
@@ -60,40 +65,50 @@ public class OrderServiceImpl implements OrderService {
         Good good = goodRepository.findById(goodId).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION_GOOD + goodId));
         order.getGoods().add(good);
-        return orderMapper.toDto(orderRepository.save(order));
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
     }
 
     @Override
     public OrderResponseDto updateOrder(OrderRequestUpdateDto requestUpdateDto, Long orderId) {
         Order order = findByIdWithGoodsAndJobs(orderId);
         setFieldsToOrder(order, requestUpdateDto);
-        return orderMapper.toDto(orderRepository.save(order));
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
     }
 
     @Override
-    public OrderResponseDto updateOrderStatus(Long orderId, Order.Status status) {
-        Order order = findByIdWithGoodsAndJobs(orderId).setStatus(status);
-        if (status == Order.Status.SUCCESSFUL || status == Order.Status.NOT_SUCCESSFUL) {
+    public OrderResponseDto updateOrderStatus(Long orderId, OrderRequestStatusDto status) {
+        Order order = findByIdWithGoodsAndJobs(orderId).setStatus(status.getStatus());
+        if (order.getStatus() == Order.Status.SUCCESSFUL
+                || order.getStatus() == Order.Status.NOT_SUCCESSFUL) {
             order.setEndDate(LocalDateTime.now());
         }
-        return orderMapper.toDto(orderRepository.save(order));
+        orderRepository.save(order);
+        return orderMapper.toDto(order);
     }
 
     @Override
+    @Transactional
     public BigDecimal payForOrder(Long orderId, Long carId) {
-        Order order = findByIdWithGoodsAndJobs(orderId).setStatus(Order.Status.PAID);
+        Order order = findByIdWithGoodsAndJobs(orderId);
+        checkIfOrderIsUnpaid(order);
+        order.setStatus(Order.Status.PAID);
         Set<Master> masters =
                 order.getJobs().stream().map(Job::getMaster).collect(Collectors.toSet());
         addOrderToMasters(masters, order);
         Owner owner = ownerRepository.findByCarId(carId).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION_OWNER + carId));
-        if (getSumIfOrderHasOnlyDiagnosis(owner, order) != BigDecimal.ZERO) {
-            return getSumIfOrderHasOnlyDiagnosis(owner, order);
-        }
         BigDecimal finalAmount = getFinalSum(owner, order);
         order.setFinalAmount(finalAmount);
         orderRepository.save(order);
         return finalAmount;
+    }
+
+    private void checkIfOrderIsUnpaid(Order order) {
+        if (order.getStatus() == Order.Status.PAID) {
+            throw new InvalidArgumentException(PAID_EXCEPTION);
+        }
     }
 
     private void addOrderToMasters(Set<Master> masters, Order order) {
@@ -109,28 +124,28 @@ public class OrderServiceImpl implements OrderService {
 
     private BigDecimal getFinalSum(Owner owner, Order order) {
         BigDecimal discount = BigDecimal
-                .valueOf(owner.getOrders().size()).divide(BigDecimal.valueOf(100));
+                .valueOf(owner.getOrders().size() - 1).divide(BigDecimal.valueOf(100));
         BigDecimal goodsPrice = order.getGoods().stream()
                 .map(Good::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal jobsPrice = order.getJobs().stream()
-                .map(Job::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add).subtract(BigDecimal.valueOf(500));
-        return goodsPrice.subtract(goodsPrice.multiply(discount))
-                .add(jobsPrice.subtract(jobsPrice.multiply(BigDecimal.valueOf(2)
-                        .multiply(discount))));
-    }
-
-    private BigDecimal getSumIfOrderHasOnlyDiagnosis(Owner owner, Order order) {
-        if (order.getJobs().size() == 1) {
-            BigDecimal resultSum = getFinalSum(owner, order).add(BigDecimal.valueOf(500));
-            order.setFinalAmount(resultSum);
-            orderRepository.save(order);
-            return resultSum;
-        } else {
-            Job job = order.getJobs().get(0).setPrice(BigDecimal.valueOf(0));
+        if (discount.compareTo(BigDecimal.valueOf(0.20)) > 0) {
+            discount = BigDecimal.valueOf(0.20);
+        }
+        if (order.getJobs().size() != 1) {
+            Job job = order.getJobs().stream().sorted().findFirst().get();
+            order.getJobs().remove(job);
+            job.setPrice(BigDecimal.ZERO);
+            order.getJobs().add(job);
             jobRepository.save(job);
-            return BigDecimal.ZERO;
+            BigDecimal jobsPrice = order.getJobs().stream()
+                    .map(Job::getPrice)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            return goodsPrice.subtract(goodsPrice.multiply(discount))
+                    .add(jobsPrice.subtract(jobsPrice.multiply(BigDecimal.valueOf(2)
+                            .multiply(discount))));
+        } else {
+            return order.getJobs().stream().findFirst().get()
+                    .getPrice().add(goodsPrice.subtract(goodsPrice.multiply(discount)));
         }
     }
 
@@ -143,9 +158,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     private void setFieldsToOrder(Order order, OrderRequestUpdateDto updateDto) {
-        if (updateDto.getCarId() != null) {
-            order.setCar(new Car().setId(updateDto.getCarId()));
-        }
         if (updateDto.getProblemDescription() != null) {
             order.setProblemDescription(updateDto.getProblemDescription());
         }

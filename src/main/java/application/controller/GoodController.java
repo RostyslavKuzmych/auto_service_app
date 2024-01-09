@@ -34,7 +34,7 @@ public class GoodController {
     @Operation(summary = "Update a good", description = "Endpoint for updating a good by id")
     @ResponseStatus(HttpStatus.OK)
     public GoodResponseDto updateGood(@PathVariable Long id,
-                                      @RequestBody GoodRequestDto goodRequestDto) {
+                                      @Valid @RequestBody GoodRequestDto goodRequestDto) {
         return goodService.updateGood(id, goodRequestDto);
     }
 }

@@ -16,9 +16,15 @@ public interface JobMapper {
     @Mapping(source = "orderId", target = "order", qualifiedByName = "getOrderById")
     Job toEntity(JobRequestDto jobRequestDto);
 
+    @Mapping(source = "status", target = "status", qualifiedByName = "getStatusStringFromStatus")
     @Mapping(source = "master", target = "masterId", qualifiedByName = "getMasterIdByMaster")
     @Mapping(source = "order", target = "orderId", qualifiedByName = "getOrderIdByOrder")
     JobResponseDto toDto(Job job);
+
+    @Named(value = "getStatusStringFromStatus")
+    default String getStatusStringFromStatus(Job.Status status) {
+        return status.toString();
+    }
 
     @Named(value = "getMasterById")
     default Master getMasterById(Long id) {
