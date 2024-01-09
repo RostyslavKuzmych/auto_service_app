@@ -55,7 +55,7 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public List<OrderResponseDto> getAllOrdersByOwnerId(Long id) {
-        Owner owner = ownerRepository.findByIdWithOrders(id).orElseThrow(()
+        Owner owner = ownerRepository.findByIdWithCars(id).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION + id));
         return owner.getCars().stream()
                 .flatMap(car -> orderRepository.findAllByCarId(car.getId()).stream())
