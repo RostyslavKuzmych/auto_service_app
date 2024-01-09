@@ -16,6 +16,8 @@ import application.repository.OwnerRepository;
 import application.service.OwnerService;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -46,20 +48,13 @@ public class OwnerServiceImpl implements OwnerService {
         List<Order> orders = ownerRequestDto.getCarsId().stream()
                 .flatMap(carId -> orderRepository.findAllByCarId(carId).stream())
                 .toList();
-        Owner owner = ownerRepository.findByIdWithOrders(id)
-                .orElseThrow(() -> new EntityNotFoundException(EXCEPTION + id));
-        orders.stream().forEach(order -> owner.getOrders().add(order));
-        ownerRepository.save(owner);
+        checkIfOwnerHasOrders(id, orders);
         return ownerMapper.toDtoWithCars(findByIdWithCars(id));
     }
 
     @Override
     public List<OrderResponseDto> getAllOrdersByOwnerId(Long id) {
-        Owner owner = ownerRepository.findByIdWithCars(id).orElseThrow(()
-                -> new EntityNotFoundException(EXCEPTION + id));
-        return owner.getCars().stream()
-                .flatMap(car -> orderRepository.findAllByCarId(car.getId()).stream())
-                .map(orderMapper::toDto).toList();
+        return findByIdWithOrders(id).getOrders().stream().map(orderMapper::toDto).toList();
     }
 
     private void checkIfOwnerExists(Long id) {
@@ -72,8 +67,26 @@ public class OwnerServiceImpl implements OwnerService {
                 .orElseThrow(() -> new EntityNotFoundException(EXCEPTION_CAR + carId));
     }
 
+    private void checkIfOwnerHasOrders(Long id, List<Order> orders) {
+        Owner owner = findByIdWithOrders(id);
+        orders.stream().forEach(order -> {
+            Owner ownerFromDb = ownerRepository.findByOrderId(order.getId()).get();
+            if (ownerFromDb.getId() != id) {
+                ownerFromDb.getOrders().remove(order);
+                ownerRepository.save(ownerFromDb);
+                owner.getOrders().add(order);
+                ownerRepository.save(owner);
+            }
+    });
+    }
+
     private Owner findByIdWithCars(Long ownerId) {
         return ownerRepository.findByIdWithCars(ownerId)
                 .orElseThrow(() -> new EntityNotFoundException(EXCEPTION + ownerId));
+    }
+
+    private Owner findByIdWithOrders(Long orderId) {
+        return ownerRepository.findByIdWithOrders(orderId).orElseThrow(()
+                -> new EntityNotFoundException(EXCEPTION + orderId));
     }
 }
