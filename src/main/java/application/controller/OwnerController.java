@@ -34,15 +34,6 @@ public class OwnerController {
         return ownerService.createOwner();
     }
 
-    @PutMapping("/{id}")
-    @Operation(summary = "Update an owner", description = "Endpoint for updating owner by id")
-    @ResponseStatus(HttpStatus.OK)
-    public OwnerResponseDtoWithCars updateOwnerById(@PathVariable Long id,
-                                                    @Valid
-                                            @RequestBody OwnerRequestDto ownerRequestDto) {
-        return ownerService.updateOwnerByid(id, ownerRequestDto);
-    }
-
     @GetMapping("/{id}/orders")
     @Operation(summary = "Get orders by owner id",
             description = "Endpoint for getting all orders by owner id")
