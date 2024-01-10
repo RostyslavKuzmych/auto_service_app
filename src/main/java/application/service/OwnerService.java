@@ -9,7 +9,5 @@ import java.util.List;
 public interface OwnerService {
     OwnerResponseDto createOwner();
 
-    OwnerResponseDtoWithCars updateOwnerByid(Long id, OwnerRequestDto ownerRequestDto);
-
     List<OrderResponseDto> getAllOrdersByOwnerId(Long id);
 }

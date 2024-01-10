@@ -72,7 +72,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto updateOrder(OrderRequestUpdateDto requestUpdateDto, Long orderId) {
         Order order = findByIdWithGoodsAndJobs(orderId);
-        setFieldsToOrder(order, requestUpdateDto);
+        order.setProblemDescription(requestUpdateDto.getProblemDescription());
         orderRepository.save(order);
         return orderMapper.toDto(order);
     }
@@ -155,12 +155,6 @@ public class OrderServiceImpl implements OrderService {
                         -> new EntityNotFoundException(EXCEPTION_OWNER + carId));
         owner.getOrders().add(savedOrder);
         ownerRepository.save(owner);
-    }
-
-    private void setFieldsToOrder(Order order, OrderRequestUpdateDto updateDto) {
-        if (updateDto.getProblemDescription() != null) {
-            order.setProblemDescription(updateDto.getProblemDescription());
-        }
     }
 
     private Order findByIdWithGoodsAndJobs(Long orderId) {
