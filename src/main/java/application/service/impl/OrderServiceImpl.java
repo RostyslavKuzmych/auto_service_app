@@ -49,12 +49,12 @@ public class OrderServiceImpl implements OrderService {
                 .setStatus(Order.Status.RECEIVED)
                 .setCar(new Car().setId(carId));
         Order savedOrder = orderRepository.save(order);
-        Job diagnosis = new Job()
+        Job diagnostics = new Job()
                 .setOrder(savedOrder)
                 .setMaster(new Master().setId(1L))
                 .setStatus(Job.Status.UNPAID)
                 .setPrice(BigDecimal.valueOf(500));
-        jobRepository.save(diagnosis);
+        jobRepository.save(diagnostics);
         addOrderToOwner(savedOrder, carId);
         return orderMapper.toDto(savedOrder);
     }
