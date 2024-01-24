@@ -24,13 +24,10 @@ public class CarServiceImpl implements CarService {
 
     @Override
     public CarResponseDto updateCarById(Long id, CarRequestDto carRequestDto) {
-        checkIfCarExists(id);
-        Car newCar = carMapper.toEntity(carRequestDto).setId(id);
-        return carMapper.toDto(carRepository.save(newCar));
-    }
-
-    private void checkIfCarExists(Long id) {
-        Car car = carRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(EXCEPTION + id));
+        if (carRepository.findById(id).isPresent()) {
+            Car newCar = carMapper.toEntity(carRequestDto).setId(id);
+            return carMapper.toDto(carRepository.save(newCar));
+        }
+        throw new EntityNotFoundException(EXCEPTION + id);
     }
 }

@@ -1,14 +1,14 @@
 package application.dto.master;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
 public class MasterRequestDto {
-    @NotNull
+    @NotBlank
     private String firstName;
-    @NotNull
+    @NotBlank
     private String lastName;
 }

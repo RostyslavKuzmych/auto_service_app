@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
     private final OrderService orderService;
 
-    @PostMapping("/{carId}")
+    @PostMapping("/cars/{carId}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Place an order", description = "Endpoint for adding new order to the db")
     public OrderResponseDto placeOrder(@PathVariable Long carId,
@@ -71,5 +71,4 @@ public class OrderController {
     public BigDecimal payForOrder(@PathVariable Long orderId, @PathVariable Long carId) {
         return orderService.payForOrder(orderId, carId);
     }
-
 }

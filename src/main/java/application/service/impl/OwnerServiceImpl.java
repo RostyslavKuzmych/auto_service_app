@@ -27,11 +27,14 @@ public class OwnerServiceImpl implements OwnerService {
 
     @Override
     public List<OrderResponseDto> getAllOrdersByOwnerId(Long id) {
-        return findByIdWithOrders(id).getOrders().stream().map(orderMapper::toDto).toList();
+        return findByIdWithOrders(id)
+                .getOrders().stream()
+                .map(orderMapper::toDto)
+                .toList();
     }
 
-    private Owner findByIdWithOrders(Long orderId) {
-        return ownerRepository.findByIdWithOrders(orderId).orElseThrow(()
-                -> new EntityNotFoundException(EXCEPTION + orderId));
+    private Owner findByIdWithOrders(Long id) {
+        return ownerRepository.findByIdWithOrders(id).orElseThrow(()
+                -> new EntityNotFoundException(EXCEPTION + id));
     }
 }

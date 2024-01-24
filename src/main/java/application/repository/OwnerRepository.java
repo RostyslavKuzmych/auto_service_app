@@ -8,11 +8,11 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface OwnerRepository extends JpaRepository<Owner, Long> {
-    @Query("SELECT owner FROM Owner owner LEFT JOIN FETCH owner.orders o "
-            + "LEFT JOIN FETCH o.goods LEFT JOIN FETCH o.jobs WHERE owner.id = :id")
+    @Query("SELECT o FROM Owner o LEFT JOIN FETCH o.orders order "
+            + "LEFT JOIN FETCH order.goods LEFT JOIN FETCH order.jobs WHERE o.id = :id")
     Optional<Owner> findByIdWithOrders(Long id);
 
-    @Query("SELECT owner FROM Owner owner LEFT JOIN FETCH owner.orders o "
-            + "JOIN FETCH owner.cars c WHERE c.id = :id")
+    @Query("SELECT o FROM Owner o LEFT JOIN FETCH o.orders order "
+            + "JOIN FETCH o.cars c WHERE c.id = :id")
     Optional<Owner> findByCarId(Long id);
 }

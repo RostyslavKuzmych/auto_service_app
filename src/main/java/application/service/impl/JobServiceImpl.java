@@ -22,8 +22,7 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobResponseDto createJob(JobRequestDto jobRequestDto) {
-        return jobMapper.toDto(jobRepository.save(jobMapper.toEntity(jobRequestDto)
-                .setStatus(Job.Status.UNPAID)));
+        return jobMapper.toDto(jobRepository.save(jobMapper.toEntity(jobRequestDto)));
     }
 
     @Override

@@ -11,7 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -20,13 +21,14 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLDelete(sql = "UPDATE jobs SET is_deleted = true WHERE id = ?")
 @SQLRestriction(value = "is_deleted = false")
 @Accessors(chain = true)
-@Data
+@Getter
+@Setter
 @Table(name = "jobs")
 public class Job implements Comparable<Job> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Order order;
     @ManyToOne
@@ -36,7 +38,7 @@ public class Job implements Comparable<Job> {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Status status;
+    private Status status = Status.UNPAID;
     @Column(nullable = false)
     private boolean isDeleted = false;
 

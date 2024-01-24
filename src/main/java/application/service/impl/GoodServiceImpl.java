@@ -24,13 +24,10 @@ public class GoodServiceImpl implements GoodService {
 
     @Override
     public GoodResponseDto updateGood(Long id, GoodRequestDto goodRequestDto) {
-        checkIfGoodExists(id);
-        Good newGood = goodMapper.toEntity(goodRequestDto).setId(id);
-        return goodMapper.toDto(goodRepository.save(newGood));
-    }
-
-    private void checkIfGoodExists(Long id) {
-        Good good = goodRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(EXCEPTION + id));
+        if (goodRepository.findById(id).isPresent()) {
+            Good newGood = goodMapper.toEntity(goodRequestDto).setId(id);
+            return goodMapper.toDto(goodRepository.save(newGood));
+        }
+        throw new EntityNotFoundException(EXCEPTION + id);
     }
 }

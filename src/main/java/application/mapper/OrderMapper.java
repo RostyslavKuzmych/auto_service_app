@@ -17,7 +17,7 @@ public interface OrderMapper {
     @Mapping(source = "car.id", target = "carId")
     @Mapping(source = "jobs", target = "jobsId", qualifiedByName = "getJobsId")
     @Mapping(source = "goods", target = "goodsId", qualifiedByName = "getGoodsId")
-    @Mapping(source = "status", target = "status", qualifiedByName = "getStringStatus")
+    @Mapping(source = "status", target = "status", qualifiedByName = "getStatusStringFromStatus")
     OrderResponseDto toDto(Order order);
 
     Order toEntity(OrderRequestDto orderRequestDto);
@@ -36,8 +36,8 @@ public interface OrderMapper {
                 .collect(Collectors.toSet());
     }
 
-    @Named(value = "getStringStatus")
-    default String getStringStatus(Order.Status status) {
+    @Named(value = "getStatusStringFromStatus")
+    default String getStatusStringFromStatus(Order.Status status) {
         return status.toString();
     }
 }

@@ -20,6 +20,8 @@ public interface OwnerMapper {
 
     @Named(value = "getCarsIdByCars")
     default Set<Long> getCarsIdByCars(Set<Car> carSet) {
-        return carSet.stream().map(Car::getId).collect(Collectors.toSet());
+        return carSet.stream()
+                .map(Car::getId)
+                .collect(Collectors.toSet());
     }
 }

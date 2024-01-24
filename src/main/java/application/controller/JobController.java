@@ -26,14 +26,14 @@ public class JobController {
 
     @PostMapping
     @Operation(summary = "Create a job",
-            description = "Endpoint for adding a new job to the db")
+            description = "Endpoint for adding new job to the db")
     @ResponseStatus(HttpStatus.CREATED)
     public JobResponseDto createJob(@Valid @RequestBody JobRequestDto jobRequestDto) {
         return jobService.createJob(jobRequestDto);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update a job", description = "Endpoint for updating a job")
+    @Operation(summary = "Update a job", description = "Endpoint for updating a job by id")
     @ResponseStatus(HttpStatus.OK)
     public JobResponseDto updateJob(@PathVariable Long id,
                                     @Valid @RequestBody JobRequestDto jobRequestDto) {
@@ -42,7 +42,7 @@ public class JobController {
 
     @PutMapping("/{id}/status")
     @Operation(summary = "Update a job status",
-            description = "Endpoint for updating a job status")
+            description = "Endpoint for updating a job status by id")
     @ResponseStatus(HttpStatus.OK)
     public JobResponseDto updateJobStatus(@PathVariable Long id,
                                           @Valid @RequestBody

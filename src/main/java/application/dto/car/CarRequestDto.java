@@ -1,5 +1,6 @@
 package application.dto.car;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -7,14 +8,14 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain = true)
 public class CarRequestDto {
-    @NotNull
+    @NotBlank
     private String brand;
-    @NotNull
+    @NotBlank
     private String model;
     @NotNull
     private Integer manufactureYear;
     @NotNull
     private Long ownerId;
-    @NotNull
+    @NotBlank
     private String number;
 }

@@ -17,17 +17,18 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @SQLDelete(sql = "UPDATE orders SET is_deleted = true WHERE id = ?")
 @SQLRestriction(value = "is_deleted = false")
-@Data
+@Getter
+@Setter
 @Accessors(chain = true)
 @Table(name = "orders")
 public class Order {
@@ -40,21 +41,18 @@ public class Order {
     @Column(nullable = false)
     private String problemDescription;
     @Column(nullable = false)
+    @CreationTimestamp
     private LocalDateTime dateOfAcceptance;
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "order")
     private Set<Job> jobs = new HashSet<>();
     @ManyToMany
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
     @JoinTable(name = "orders_goods",
             joinColumns = @JoinColumn(name = "order_id"),
             inverseJoinColumns = @JoinColumn(name = "good_id"))
     private Set<Good> goods = new HashSet<>();
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.RECEIVED;
     @Column(nullable = false)
     private BigDecimal finalAmount = BigDecimal.ZERO;
     private LocalDateTime endDate;

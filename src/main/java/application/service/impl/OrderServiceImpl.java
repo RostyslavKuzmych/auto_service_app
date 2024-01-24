@@ -33,7 +33,15 @@ public class OrderServiceImpl implements OrderService {
     private static final String EXCEPTION_GOOD = "Can't find good by id ";
     private static final String EXCEPTION_ORDER = "Can't find order by id ";
     private static final String EXCEPTION_OWNER = "Can't find owner by car id ";
-    private static final String PAID_EXCEPTION = "This order is already paid!";
+    private static final String PAID_EXCEPTION = "This order has already been paid";
+    private static final Long MASTER_STEPAN_ID = 1L;
+    private static final Integer UNPAID_ORDER_COUNT = 1;
+    private static final Integer DIAGNOSTICS_PRICE = 500;
+    private static final Integer ONE_HUNDRED = 100;
+    private static final Integer ZERO = 0;
+    private static final Integer ONE = 1;
+    private static final Integer DOUBLE_DISCOUNT = 2;
+    private static final Double MAXIMUM_PERCENTAGE = 0.20;
     private final OrderMapper orderMapper;
     private final OrderRepository orderRepository;
     private final OwnerRepository ownerRepository;
@@ -45,15 +53,12 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public OrderResponseDto placeOrder(Long carId, OrderRequestDto orderRequestDto) {
         Order order = orderMapper.toEntity(orderRequestDto)
-                .setDateOfAcceptance(LocalDateTime.now())
-                .setStatus(Order.Status.RECEIVED)
                 .setCar(new Car().setId(carId));
         Order savedOrder = orderRepository.save(order);
         Job diagnostics = new Job()
                 .setOrder(savedOrder)
-                .setMaster(new Master().setId(1L))
-                .setStatus(Job.Status.UNPAID)
-                .setPrice(BigDecimal.valueOf(500));
+                .setMaster(new Master().setId(MASTER_STEPAN_ID))
+                .setPrice(BigDecimal.valueOf(DIAGNOSTICS_PRICE));
         jobRepository.save(diagnostics);
         addOrderToOwner(savedOrder, carId);
         return orderMapper.toDto(savedOrder);
@@ -115,44 +120,42 @@ public class OrderServiceImpl implements OrderService {
         masters.forEach(master -> {
             Master masterFromDb
                     = masterRepository.findByIdWithAllOrders(master.getId()).get();
-            Set<Order> orders = masterFromDb.getOrders();
-            orders.add(order);
-            masterFromDb.setOrders(orders);
+            masterFromDb.getOrders().add(order);
             masterRepository.save(masterFromDb);
         });
     }
 
     private BigDecimal getFinalSum(Owner owner, Order order) {
-        BigDecimal discount = BigDecimal
-                .valueOf(owner.getOrders().size() - 1).divide(BigDecimal.valueOf(100));
+        BigDecimal discountPercentage = BigDecimal
+                .valueOf(owner.getOrders().size() - UNPAID_ORDER_COUNT)
+                .divide(BigDecimal.valueOf(ONE_HUNDRED));
         BigDecimal goodsPrice = order.getGoods().stream()
                 .map(Good::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        if (discount.compareTo(BigDecimal.valueOf(0.20)) > 0) {
-            discount = BigDecimal.valueOf(0.20);
+        if (discountPercentage.compareTo(BigDecimal.valueOf(MAXIMUM_PERCENTAGE)) > ZERO) {
+            discountPercentage = BigDecimal.valueOf(MAXIMUM_PERCENTAGE);
         }
-        if (order.getJobs().size() != 1) {
+        if (order.getJobs().size() != ONE) {
             Job job = order.getJobs().stream().sorted().findFirst().get();
             order.getJobs().remove(job);
-            job.setPrice(BigDecimal.ZERO);
+            jobRepository.save(job.setPrice(BigDecimal.ZERO));
             order.getJobs().add(job);
-            jobRepository.save(job);
             BigDecimal jobsPrice = order.getJobs().stream()
                     .map(Job::getPrice)
                     .reduce(BigDecimal.ZERO, BigDecimal::add);
-            return goodsPrice.subtract(goodsPrice.multiply(discount))
-                    .add(jobsPrice.subtract(jobsPrice.multiply(BigDecimal.valueOf(2)
-                            .multiply(discount))));
+            return goodsPrice.subtract(goodsPrice.multiply(discountPercentage))
+                    .add(jobsPrice.subtract(jobsPrice.multiply(BigDecimal.valueOf(DOUBLE_DISCOUNT)
+                            .multiply(discountPercentage))));
         } else {
             return order.getJobs().stream().findFirst().get()
-                    .getPrice().add(goodsPrice.subtract(goodsPrice.multiply(discount)));
+                    .getPrice().add(goodsPrice.subtract(goodsPrice
+                            .multiply(discountPercentage)));
         }
     }
 
     private void addOrderToOwner(Order savedOrder, Long carId) {
         Owner owner = ownerRepository.findByCarId(carId)
-                .orElseThrow(()
-                        -> new EntityNotFoundException(EXCEPTION_OWNER + carId));
+                .orElseThrow(() -> new EntityNotFoundException(EXCEPTION_OWNER + carId));
         owner.getOrders().add(savedOrder);
         ownerRepository.save(owner);
     }

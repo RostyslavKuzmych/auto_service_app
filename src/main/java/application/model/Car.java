@@ -31,7 +31,7 @@ public class Car {
     private Integer manufactureYear;
     @Column(nullable = false, unique = true)
     private String number;
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(nullable = false)
     private Owner owner;
     @Column(nullable = false)

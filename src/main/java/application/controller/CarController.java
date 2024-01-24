@@ -33,7 +33,7 @@ public class CarController {
     @PutMapping("/{id}")
     @Operation(summary = "Update a car", description = "Endpoint for updating a car by id")
     @ResponseStatus(HttpStatus.OK)
-    public CarResponseDto updateCarByid(@PathVariable Long id,
+    public CarResponseDto updateCarById(@PathVariable Long id,
                                         @Valid @RequestBody CarRequestDto requestDto) {
         return carService.updateCarById(id, requestDto);
     }
