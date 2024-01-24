@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-orders_goods-table
+      author: rostyslav_kuzmych
+      changes:
+        - createTable:
+            tableName: orders_goods
+            columns:
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_orders_goods_order_id
+                    references: orders(id)
+                    primaryKey: true
+              - column:
+                  name: good_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_orders_goods_good_id
+                    references: goods(id)
+                    primaryKey: true

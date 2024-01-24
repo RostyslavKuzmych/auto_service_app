@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-masters_orders-table
+      author: rostyslav_kuzmych
+      changes:
+        - createTable:
+            tableName: masters_orders
+            columns:
+              - column:
+                  name: master_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_masters_orders_master_id
+                    references: masters(id)
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    foreignKeyName: fk_masters_orders_order_id
+                    references: orders(id)

@@ -1,0 +1,24 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_owners_orders-table
+      author: rostyslav_kuzmych
+      changes:
+        - createTable:
+            tableName: owners_orders
+            columns:
+              - column:
+                  name: owner_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_owners_orders_owner_id
+                    references: owners(id)
+              - column:
+                  name: order_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    foreignKeyName: fk_owners_orders_order_id
+                    references: orders(id)
