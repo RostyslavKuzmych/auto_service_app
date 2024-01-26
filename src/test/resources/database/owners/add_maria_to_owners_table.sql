@@ -1,0 +1,1 @@
+insert into owners (id, first_name, last_name, phone_number) values (5, 'Maria', 'Ivanivna', '+380674567546');

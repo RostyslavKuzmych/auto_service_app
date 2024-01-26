@@ -20,7 +20,7 @@ databaseChangeLog:
                   value: "ca323"
               - column:
                   name: owner_id
-                  value: 1
+                  valueComputed: (SELECT id FROM owners WHERE first_name = 'Ivan' AND last_name = 'Petrovych')
         - insert:
             tableName: cars
             columns:
@@ -38,7 +38,7 @@ databaseChangeLog:
                   value: "gh233"
               - column:
                   name: owner_id
-                  value: 1
+                  valueComputed: (SELECT id FROM owners WHERE first_name = 'Ivan' AND last_name = 'Petrovych')
         - insert:
             tableName: cars
             columns:
@@ -56,4 +56,4 @@ databaseChangeLog:
                   value: "fdh34"
               - column:
                   name: owner_id
-                  value: 2
+                  valueComputed: (SELECT id FROM owners WHERE first_name = 'Olga' AND last_name = 'Kovalenko')

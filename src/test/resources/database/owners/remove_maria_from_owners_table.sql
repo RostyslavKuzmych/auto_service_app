@@ -1,0 +1,1 @@
+delete from owners where id = 5;
