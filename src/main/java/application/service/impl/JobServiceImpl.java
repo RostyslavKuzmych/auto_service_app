@@ -6,8 +6,6 @@ import application.dto.job.JobResponseDto;
 import application.exception.EntityNotFoundException;
 import application.mapper.JobMapper;
 import application.model.Job;
-import application.model.Master;
-import application.model.Order;
 import application.repository.JobRepository;
 import application.service.JobService;
 import lombok.RequiredArgsConstructor;
@@ -27,10 +25,11 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public JobResponseDto updateJob(Long id, JobRequestDto jobRequestDto) {
-        Job job = findById(id)
-                .setMaster(new Master().setId(jobRequestDto.getMasterId()))
-                .setOrder(new Order().setId(jobRequestDto.getOrderId()));
-        return jobMapper.toDto(jobRepository.save(job));
+        if (jobRepository.findById(id).isPresent()) {
+            Job job = jobMapper.toEntity(jobRequestDto).setId(id);
+            return jobMapper.toDto(jobRepository.save(job));
+        }
+        throw new EntityNotFoundException(EXCEPTION + id);
     }
 
     @Override
