@@ -40,6 +40,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceImplTest {
+    private static final String VOVA_PHONE_NUMBER = "+380984567812";
+    private static final String VOVA = "Vova";
+    private static final String KOVAL = "Koval";
     private static final Integer ZERO = 0;
     private static final String PROCESSED = "PROCESSED";
     private static final BigDecimal ONE_THOUSAND = BigDecimal.valueOf(1000);
@@ -96,7 +99,8 @@ class OrderServiceImplTest {
         lubricant = new Good().setId(LUBRICANT_ID)
                 .setName(LUBRICANT)
                 .setPrice(LUBRICANT_PRICE);
-        vova = new Owner().setId(VOVA_ID).setCars(Set.of(new Car().setId(AUDI_ID)));
+        vova = new Owner().setId(VOVA_ID).setCars(Set.of(new Car().setId(AUDI_ID)))
+                .setFirstName(VOVA).setLastName(KOVAL).setPhoneNumber(VOVA_PHONE_NUMBER);
         diagnostics = new Job()
                 .setId(DIAGNOSTICS_ID)
                 .setOrder(new Order().setId(FIRST_ORDER_ID))

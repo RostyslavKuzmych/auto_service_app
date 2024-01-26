@@ -1,6 +1,7 @@
 package application.mapper;
 
 import application.config.MapperConfig;
+import application.dto.owner.OwnerRequestDto;
 import application.dto.owner.OwnerResponseDto;
 import application.dto.owner.OwnerResponseDtoWithCars;
 import application.model.Car;
@@ -14,6 +15,8 @@ import org.mapstruct.Named;
 @Mapper(config = MapperConfig.class)
 public interface OwnerMapper {
     OwnerResponseDto toDto(Owner owner);
+
+    Owner toEntity(OwnerRequestDto ownerRequestDto);
 
     @Mapping(target = "carsId", source = "cars", qualifiedByName = "getCarsIdByCars")
     OwnerResponseDtoWithCars toDtoWithCars(Owner owner);

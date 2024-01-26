@@ -1,1 +1,1 @@
-delete from goods where name = 'engine';
+delete from goods where id = 5;
