@@ -11,14 +11,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-@Getter
-@Setter
+@Data
 @SQLDelete(sql = "UPDATE owners SET is_deleted = true WHERE id = ?")
 @SQLRestriction(value = "is_deleted = false")
 @Entity
@@ -29,8 +29,12 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @OneToMany(mappedBy = "owner")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     private Set<Car> cars = new HashSet<>();
     @OneToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @JoinTable(name = "owners_orders",
             joinColumns = @JoinColumn(name = "owner_id"),
             inverseJoinColumns = @JoinColumn(name = "order_id"))

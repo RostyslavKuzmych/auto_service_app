@@ -7,17 +7,17 @@ databaseChangeLog:
             tableName: owners
             columns:
               - column:
-                  name: id
-                  value: 1
+                  name: is_deleted
+                  value: 'false'
         - insert:
             tableName: owners
             columns:
               - column:
-                  name: id
-                  value: 2
+                  name: is_deleted
+                  value: 'false'
         - insert:
             tableName: owners
             columns:
               - column:
-                  name: id
-                  value: 3
+                  name: is_deleted
+                  value: 'false'

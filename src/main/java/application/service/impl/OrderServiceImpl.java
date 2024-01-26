@@ -30,12 +30,13 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class OrderServiceImpl implements OrderService {
+    private static final String EXCEPTION_JOB = "Can't find job by id ";
+    private static final String EXCEPTION_MASTER = "Can't find master by id ";
     private static final String EXCEPTION_GOOD = "Can't find good by id ";
     private static final String EXCEPTION_ORDER = "Can't find order by id ";
     private static final String EXCEPTION_OWNER = "Can't find owner by car id ";
     private static final String PAID_EXCEPTION = "This order has already been paid";
     private static final Long MASTER_STEPAN_ID = 1L;
-    private static final Integer UNPAID_ORDER_COUNT = 1;
     private static final Integer DIAGNOSTICS_PRICE = 500;
     private static final Integer ONE_HUNDRED = 100;
     private static final Integer ZERO = 0;
@@ -98,13 +99,13 @@ public class OrderServiceImpl implements OrderService {
     public BigDecimal payForOrder(Long orderId, Long carId) {
         Order order = findByIdWithGoodsAndJobs(orderId);
         checkIfOrderIsUnpaid(order);
-        order.setStatus(Order.Status.PAID);
         Set<Master> masters =
                 order.getJobs().stream().map(Job::getMaster).collect(Collectors.toSet());
         addOrderToMasters(masters, order);
         Owner owner = ownerRepository.findByCarId(carId).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION_OWNER + carId));
         BigDecimal finalAmount = getFinalSum(owner, order);
+        order.setStatus(Order.Status.PAID);
         order.setFinalAmount(finalAmount);
         orderRepository.save(order);
         return finalAmount;
@@ -119,7 +120,10 @@ public class OrderServiceImpl implements OrderService {
     private void addOrderToMasters(Set<Master> masters, Order order) {
         masters.forEach(master -> {
             Master masterFromDb
-                    = masterRepository.findByIdWithAllOrders(master.getId()).get();
+                    = masterRepository.findByIdWithAllOrders(master.getId())
+                    .orElseThrow(()
+                            -> new EntityNotFoundException(EXCEPTION_MASTER
+                            + master.getId()));
             masterFromDb.getOrders().add(order);
             masterRepository.save(masterFromDb);
         });
@@ -127,7 +131,9 @@ public class OrderServiceImpl implements OrderService {
 
     private BigDecimal getFinalSum(Owner owner, Order order) {
         BigDecimal discountPercentage = BigDecimal
-                .valueOf(owner.getOrders().size() - UNPAID_ORDER_COUNT)
+                .valueOf(owner.getOrders()
+                        .stream()
+                        .filter(o -> o.getStatus() == Order.Status.PAID).count())
                 .divide(BigDecimal.valueOf(ONE_HUNDRED));
         BigDecimal goodsPrice = order.getGoods().stream()
                 .map(Good::getPrice)
@@ -136,7 +142,8 @@ public class OrderServiceImpl implements OrderService {
             discountPercentage = BigDecimal.valueOf(MAXIMUM_PERCENTAGE);
         }
         if (order.getJobs().size() != ONE) {
-            Job job = order.getJobs().stream().sorted().findFirst().get();
+            Job job = order.getJobs().stream().sorted().findFirst()
+                    .orElseThrow(() -> new EntityNotFoundException(EXCEPTION_JOB));
             order.getJobs().remove(job);
             jobRepository.save(job.setPrice(BigDecimal.ZERO));
             order.getJobs().add(job);
@@ -147,7 +154,8 @@ public class OrderServiceImpl implements OrderService {
                     .add(jobsPrice.subtract(jobsPrice.multiply(BigDecimal.valueOf(DOUBLE_DISCOUNT)
                             .multiply(discountPercentage))));
         } else {
-            return order.getJobs().stream().findFirst().get()
+            return order.getJobs().stream().findFirst()
+                    .orElseThrow(() -> new EntityNotFoundException(EXCEPTION_JOB))
                     .getPrice().add(goodsPrice.subtract(goodsPrice
                             .multiply(discountPercentage)));
         }

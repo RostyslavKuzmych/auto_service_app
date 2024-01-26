@@ -11,8 +11,9 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -20,8 +21,7 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLDelete(sql = "UPDATE books SET is_deleted = true WHERE id = ?")
 @SQLRestriction(value = "is_deleted = false")
 @Entity
-@Getter
-@Setter
+@Data
 @Accessors(chain = true)
 @Table(name = "masters")
 public class Master {
@@ -33,6 +33,8 @@ public class Master {
     @Column(nullable = false)
     private String lastName;
     @OneToMany
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     @JoinTable(name = "masters_orders",
             joinColumns = @JoinColumn(name = "master_id"),
             inverseJoinColumns = @JoinColumn(name = "order_id"))
