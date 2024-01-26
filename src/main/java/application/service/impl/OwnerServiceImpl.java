@@ -1,6 +1,7 @@
 package application.service.impl;
 
 import application.dto.order.OrderResponseDto;
+import application.dto.owner.OwnerRequestDto;
 import application.dto.owner.OwnerResponseDto;
 import application.exception.EntityNotFoundException;
 import application.mapper.OrderMapper;
@@ -21,8 +22,8 @@ public class OwnerServiceImpl implements OwnerService {
     private final OrderMapper orderMapper;
 
     @Override
-    public OwnerResponseDto createOwner() {
-        return ownerMapper.toDto(ownerRepository.save(new Owner()));
+    public OwnerResponseDto createOwner(OwnerRequestDto ownerRequestDto) {
+        return ownerMapper.toDto(ownerRepository.save(ownerMapper.toEntity(ownerRequestDto)));
     }
 
     @Override
@@ -31,6 +32,16 @@ public class OwnerServiceImpl implements OwnerService {
                 .getOrders().stream()
                 .map(orderMapper::toDto)
                 .toList();
+    }
+
+    @Override
+    public OwnerResponseDto updateOwner(Long id, OwnerRequestDto ownerRequestDto) {
+        Owner owner = ownerRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(EXCEPTION + id));
+        owner.setPhoneNumber(ownerRequestDto.getPhoneNumber())
+                .setFirstName(ownerRequestDto.getFirstName())
+                .setLastName(ownerRequestDto.getLastName());
+        return ownerMapper.toDto(ownerRepository.save(owner));
     }
 
     private Owner findByIdWithOrders(Long id) {

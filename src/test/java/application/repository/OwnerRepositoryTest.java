@@ -24,6 +24,9 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
 @DataJpaTest
 class OwnerRepositoryTest {
+    private static final String IVAN_PHONE_NUMBER = "+380984354356";
+    private static final String IVAN = "Ivan";
+    private static final String PETROVYCH = "Petrovych";
     private static final Long AUDI_ID = 1L;
     private static final Long FIRST_ORDER_ID = 1L;
     private static final Long SECOND_ORDER_ID = 2L;
@@ -40,7 +43,8 @@ class OwnerRepositoryTest {
 
     @BeforeAll
     static void beforeAll() {
-        owner = new Owner().setId(FIRST_OWNER_ID);
+        owner = new Owner().setId(FIRST_OWNER_ID).setPhoneNumber(IVAN_PHONE_NUMBER)
+                .setFirstName(IVAN).setLastName(PETROVYCH);
         firstOrder = new Order().setId(FIRST_ORDER_ID)
                 .setStatus(Order.Status.PAID)
                 .setCar(new Car().setId(AUDI_ID))

@@ -7,4 +7,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class OwnerResponseDto {
     private Long id;
+    private String firstName;
+    private String lastName;
+    private String phoneNumber;
 }

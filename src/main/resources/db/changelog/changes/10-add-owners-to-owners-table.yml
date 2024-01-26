@@ -7,17 +7,35 @@ databaseChangeLog:
             tableName: owners
             columns:
               - column:
-                  name: is_deleted
-                  value: 'false'
+                  name: phone_number
+                  value: '+380984354356'
+              - column:
+                  name: first_name
+                  value: 'Ivan'
+              - column:
+                  name: last_name
+                  value: 'Petrovych'
         - insert:
             tableName: owners
             columns:
               - column:
-                  name: is_deleted
-                  value: 'false'
+                  name: phone_number
+                  value: '+380987754356'
+              - column:
+                  name: first_name
+                  value: 'Olga'
+              - column:
+                  name: last_name
+                  value: 'Kovalenko'
         - insert:
             tableName: owners
             columns:
               - column:
-                  name: is_deleted
-                  value: 'false'
+                  name: phone_number
+                  value: '+380984309856'
+              - column:
+                  name: first_name
+                  value: 'Maxim'
+              - column:
+                  name: last_name
+                  value: 'Lysenko'

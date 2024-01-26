@@ -1,1 +1,1 @@
-delete from cars where number = '156DFG';
+delete from cars where id = 5;
