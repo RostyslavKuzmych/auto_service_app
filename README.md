@@ -51,7 +51,7 @@ By the way, you also can try to send requests to the endpoints by using Postman.
 I created public collection of endpoints, you can open that by clicking [here](https://www.postman.com/lunar-module-cosmologist-43034160/workspace/my-projects/collection/31108999-341d9115-11a0-48e4-a786-8efc412bb265?action=share&creator=31108999).
 Here are all examples of requests, which can be sent by users. Moreover, you can send requests from swagger by clicking here.
 To elaborate on that, I recorded a video where I showed how all endpoints work.
-You can watch it by clicking [here](https://www.loom.com/share/53573f09fe684103896f3e9107d278fe) 😊🎥.
+You can watch it by clicking [here](https://www.loom.com/share/f6001420d3da40a5a9f64f035bd82321) 😊🎥.
 
 ## ⌛ History of creating the project ⌛
 During the development of the project, I encountered several challenges. 
