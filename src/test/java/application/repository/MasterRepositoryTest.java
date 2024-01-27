@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
@@ -22,6 +23,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
         "classpath:database/masters_orders/remove_stepan_orders.sql",
         "classpath:database/orders/remove_two_orders_from_orders_table.sql"
 }, executionPhase = Sql.ExecutionPhase.AFTER_TEST_CLASS)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DataJpaTest
 class MasterRepositoryTest {
     private static final Long AUDI_ID = 1L;
