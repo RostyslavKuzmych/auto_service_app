@@ -2,10 +2,13 @@ package application.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import application.dto.order.OrderResponseDto;
+import application.dto.owner.OwnerRequestDto;
 import application.dto.owner.OwnerResponseDto;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.math.BigDecimal;
@@ -17,6 +20,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -27,6 +31,12 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OwnerControllerTest {
     protected static MockMvc mockMvc;
+    private static final Long MARIA_ID = 5L;
+    private static final String MARIA_STRING_ID = "/5";
+    private static final String ID = "id";
+    private static final String ANNA_PHONE_NUMBER = "+380965676431";
+    private static final String ANNA = "Anna";
+    private static final String SHEVCHENKO = "Shevchenko";
     private static final String PATH = "classpath:database/owners/";
     private static final String PATH_OWNERS_ORDERS = "classpath:database/owners_orders/";
     private static final String PATH_ORDERS = "classpath:database/orders/";
@@ -43,8 +53,11 @@ class OwnerControllerTest {
     private static final BigDecimal BIG_AMOUNT = BigDecimal.valueOf(1200);
     private static final String DESCRIPTION_SECOND_ORDER = "Something broke down...";
     private static final BigDecimal SMALL_AMOUNT = BigDecimal.valueOf(500);
+    private static OwnerRequestDto annaRequestDto;
+    private static OwnerResponseDto annaResponseDto;
     private static OrderResponseDto firstOrderResponseDto;
     private static OrderResponseDto secondOrderResponseDto;
+    private static String jsonRequest;
     @Autowired
     private ObjectMapper objectMapper;
 
@@ -55,7 +68,11 @@ class OwnerControllerTest {
     }
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws JsonProcessingException {
+        annaRequestDto = new OwnerRequestDto().setPhoneNumber(ANNA_PHONE_NUMBER)
+                .setFirstName(ANNA).setLastName(SHEVCHENKO);
+        annaResponseDto = new OwnerResponseDto().setPhoneNumber(ANNA_PHONE_NUMBER)
+                .setFirstName(ANNA).setLastName(SHEVCHENKO);
         firstOrderResponseDto = new OrderResponseDto().setId(FIRST_LONG_ORDER_ID)
                 .setStatus(PAID)
                 .setCarId(AUDI_LONG_ID)
@@ -66,24 +83,59 @@ class OwnerControllerTest {
                 .setFinalAmount(SMALL_AMOUNT)
                 .setProblemDescription(DESCRIPTION_SECOND_ORDER)
                 .setCarId(AUDI_LONG_ID);
+        jsonRequest = objectMapper.writeValueAsString(annaRequestDto);
     }
 
     @Test
-    @Sql(scripts = PATH + "remove_all_recent_owners_from_owners_table.sql",
+    @Sql(scripts = PATH + "remove_anna_from_owners_table.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("""
             Verify createOwner() method
             """)
     void createOwner_ValidRequest_ReturnResponseDto() throws Exception {
         // when
-        MvcResult mvcResult = mockMvc.perform(post(API))
+        MvcResult mvcResult = mockMvc.perform(post(API).contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
                 .andExpect(status().isCreated()).andReturn();
 
         // then
         OwnerResponseDto actual = objectMapper.readValue(mvcResult.getResponse()
                 .getContentAsString(), OwnerResponseDto.class);
         Assertions.assertNotNull(actual);
-        Assertions.assertNotNull(actual.getId());
+        EqualsBuilder.reflectionEquals(annaResponseDto, actual, ID);
+    }
+
+    @Test
+    @DisplayName("""
+            Verify updateMaster() method
+            """)
+    @Sql(scripts = PATH + "add_maria_to_owners_table.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = PATH + "remove_maria_from_owners_table.sql",
+            executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void updateMaster_ValidRequestDto_ReturnResponseDto() throws Exception {
+        // when
+        MvcResult mvcResult = mockMvc.perform(put(API + MARIA_STRING_ID)
+                .content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andReturn();
+
+        // then
+        OwnerResponseDto expected = annaResponseDto.setId(MARIA_ID);
+        OwnerResponseDto actual = objectMapper.readValue(mvcResult.getResponse()
+                .getContentAsString(), OwnerResponseDto.class);
+        Assertions.assertNotNull(actual);
+        Assertions.assertEquals(annaResponseDto, actual);
+    }
+
+    @Test
+    @DisplayName("""
+            Verify updateMaster() method
+            """)
+    void updateMaster_InvalidRequestDto_ReturnExpectedStatus() throws Exception {
+        // when
+        mockMvc.perform(put(API + MARIA_STRING_ID)
+                        .content(jsonRequest).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
