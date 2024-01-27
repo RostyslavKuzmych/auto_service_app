@@ -71,3 +71,4 @@ Among other potential enhancements, allowing users to provide feedback on the se
 Thank you for reading the presentation, good luck! 💫
 
 ![App Screenshot](https://gifdb.com/images/high/thank-you-meme-the-rock-w46sac8m8op8tynp.gif)
+
