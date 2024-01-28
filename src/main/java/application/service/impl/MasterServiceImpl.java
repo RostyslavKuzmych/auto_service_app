@@ -55,6 +55,10 @@ public class MasterServiceImpl implements MasterService {
 
     @Override
     @Transactional
+    /*
+     * The master's salary is 40% of all completed tasks
+     * for which he has not yet received payment.
+     */
     public BigDecimal getSalaryByMasterId(Long id) {
         BigDecimal salary = findByIdWithAllOrders(id)
                 .getOrders().stream()

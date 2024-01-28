@@ -52,6 +52,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
+    /*
+     * When placing an order, car diagnostics is automatically included.
+     */
     public OrderResponseDto placeOrder(Long carId, OrderRequestDto orderRequestDto) {
         Order order = orderMapper.toEntity(orderRequestDto)
                 .setCar(new Car().setId(carId));
@@ -129,6 +132,11 @@ public class OrderServiceImpl implements OrderService {
         });
     }
 
+    /*
+     * Owner's car discount:
+     * for goods, 1% multiplied by the quantity of paid orders;
+     * for services, 2% multiplied by the quantity of paid orders.
+     */
     private BigDecimal getFinalSum(Owner owner, Order order) {
         BigDecimal discountPercentage = BigDecimal
                 .valueOf(owner.getOrders()
