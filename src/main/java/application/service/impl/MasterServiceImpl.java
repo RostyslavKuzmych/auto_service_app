@@ -64,22 +64,30 @@ public class MasterServiceImpl implements MasterService {
      * for which he has not yet received payment.
      */
     public BigDecimal getSalaryByMasterId(Long id) {
-        Set<Job> unpaidJobs = findByIdWithAllOrders(id)
+        Set<Job> unpaidJobs = getUnpaidJobs(id);
+        unpaidJobs.forEach(c -> jobRepository.save(c.setStatus(Job.Status.PAID)));
+        BigDecimal priceOfJobs = getPriceOfJobs(unpaidJobs);
+        return priceOfJobs.multiply(BigDecimal.valueOf(MASTER_PERCENT));
+    }
+
+    private BigDecimal getPriceOfJobs(Set<Job> unpaidJobs) {
+        return unpaidJobs.stream()
+                .map(Job::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Set<Job> getUnpaidJobs(Long id) {
+        return findByIdWithAllOrders(id)
                 .getOrders().stream()
                 .flatMap(order -> order.getJobs().stream())
                 .filter(job -> Objects.equals(job.getMaster().getId(), id))
                 .filter(job -> job.getStatus() == Job.Status.UNPAID)
                 .collect(Collectors.toSet());
-        unpaidJobs.forEach(c -> jobRepository.save(c.setStatus(Job.Status.PAID)));
-        BigDecimal salary
-                = unpaidJobs.stream()
-                .map(Job::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return salary.multiply(BigDecimal.valueOf(MASTER_PERCENT));
     }
 
     private Master findByIdWithAllOrders(Long id) {
         return masterRepository.findMasterById(id).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION + id));
     }
+
 }
