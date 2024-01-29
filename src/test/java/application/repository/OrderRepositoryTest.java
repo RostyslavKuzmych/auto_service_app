@@ -78,7 +78,7 @@ class OrderRepositoryTest {
             """)
     void findByIdWithGoodsAndJobs_ValidOrderId_ReturnOrder() {
         Order expected = order;
-        Order actual = orderRepository.findByIdWithGoodsAndJobs(FIRST_ORDER_ID)
+        Order actual = orderRepository.findOrderById(FIRST_ORDER_ID)
                 .orElse(null);
         Assertions.assertNotNull(actual);
         EqualsBuilder.reflectionEquals(expected, actual);

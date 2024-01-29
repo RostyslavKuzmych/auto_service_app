@@ -197,7 +197,7 @@ class MasterServiceImplTest {
             """)
     void getAllSuccessfulOrdersByMasterId_ValidMasterId_ReturnList() {
         // when
-        when(masterRepository.findByIdWithAllOrders(STEPAN_ID))
+        when(masterRepository.findMasterById(STEPAN_ID))
                 .thenReturn(Optional.of(stepan.setOrders(Set.of(firstOrder, secondOrder))));
         when(orderMapper.toDto(firstOrder)).thenReturn(firstOrderDto);
         when(orderMapper.toDto(secondOrder)).thenReturn(secondOrderDto);
@@ -219,7 +219,7 @@ class MasterServiceImplTest {
         stepan.setOrders(Set.of(firstOrder.setJobs(Set.of(wheelChange, lubricantChange))));
 
         // when
-        when(masterRepository.findByIdWithAllOrders(STEPAN_ID))
+        when(masterRepository.findMasterById(STEPAN_ID))
                 .thenReturn(Optional.of(stepan));
         when(jobRepository.save(wheelChange))
                 .thenReturn(wheelChange);
