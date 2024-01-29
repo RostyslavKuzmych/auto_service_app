@@ -16,6 +16,9 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +39,7 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
+    @Transactional
     public MasterResponseDto updateById(Long id, MasterRequestDto masterRequestDto) {
         Optional<Master> master = masterRepository.findById(id);
         if (master.isPresent()) {
@@ -60,19 +64,22 @@ public class MasterServiceImpl implements MasterService {
      * for which he has not yet received payment.
      */
     public BigDecimal getSalaryByMasterId(Long id) {
-        BigDecimal salary = findByIdWithAllOrders(id)
+        Set<Job> unpaidJobs = findByIdWithAllOrders(id)
                 .getOrders().stream()
                 .flatMap(order -> order.getJobs().stream())
                 .filter(job -> Objects.equals(job.getMaster().getId(), id))
                 .filter(job -> job.getStatus() == Job.Status.UNPAID)
-                .map(job -> jobRepository.save(job.setStatus(Job.Status.PAID)))
+                .collect(Collectors.toSet());
+        unpaidJobs.forEach(c -> jobRepository.save(c.setStatus(Job.Status.PAID)));
+        BigDecimal salary
+                = unpaidJobs.stream()
                 .map(Job::getPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         return salary.multiply(BigDecimal.valueOf(MASTER_PERCENT));
     }
 
     private Master findByIdWithAllOrders(Long id) {
-        return masterRepository.findByIdWithAllOrders(id).orElseThrow(()
+        return masterRepository.findMasterById(id).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION + id));
     }
 }

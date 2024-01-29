@@ -7,6 +7,7 @@ import application.mapper.GoodMapper;
 import application.model.Good;
 import application.repository.GoodRepository;
 import application.service.GoodService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class GoodServiceImpl implements GoodService {
     }
 
     @Override
+    @Transactional
     public GoodResponseDto updateGood(Long id, GoodRequestDto goodRequestDto) {
         if (goodRepository.findById(id).isPresent()) {
             Good newGood = goodMapper.toEntity(goodRequestDto).setId(id);

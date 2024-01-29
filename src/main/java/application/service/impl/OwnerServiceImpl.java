@@ -10,6 +10,8 @@ import application.model.Owner;
 import application.repository.OwnerRepository;
 import application.service.OwnerService;
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
+    @Transactional
     public OwnerResponseDto updateOwner(Long id, OwnerRequestDto ownerRequestDto) {
         Owner owner = ownerRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(EXCEPTION + id));

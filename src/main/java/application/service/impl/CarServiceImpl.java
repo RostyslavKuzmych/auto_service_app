@@ -7,6 +7,7 @@ import application.mapper.CarMapper;
 import application.model.Car;
 import application.repository.CarRepository;
 import application.service.CarService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
+    @Transactional
     public CarResponseDto updateCarById(Long id, CarRequestDto carRequestDto) {
         if (carRepository.findById(id).isPresent()) {
             Car newCar = carMapper.toEntity(carRequestDto).setId(id);

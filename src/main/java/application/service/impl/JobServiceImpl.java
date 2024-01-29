@@ -8,6 +8,7 @@ import application.mapper.JobMapper;
 import application.model.Job;
 import application.repository.JobRepository;
 import application.service.JobService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional
     public JobResponseDto updateJob(Long id, JobRequestDto jobRequestDto) {
         if (jobRepository.findById(id).isPresent()) {
             Job job = jobMapper.toEntity(jobRequestDto).setId(id);
@@ -33,6 +35,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional
     public JobResponseDto updateJobStatus(Long id, JobRequestStatusDto status) {
         Job job = findById(id).setStatus(status.getStatus());
         return jobMapper.toDto(jobRepository.save(job));
