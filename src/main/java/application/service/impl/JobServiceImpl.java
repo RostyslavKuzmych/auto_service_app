@@ -8,9 +8,9 @@ import application.mapper.JobMapper;
 import application.model.Job;
 import application.repository.JobRepository;
 import application.service.JobService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -20,6 +20,7 @@ public class JobServiceImpl implements JobService {
     private final JobMapper jobMapper;
 
     @Override
+    @Transactional
     public JobResponseDto createJob(JobRequestDto jobRequestDto) {
         return jobMapper.toDto(jobRepository.save(jobMapper.toEntity(jobRequestDto)));
     }

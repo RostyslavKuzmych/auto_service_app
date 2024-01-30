@@ -11,7 +11,6 @@ import application.model.Master;
 import application.repository.JobRepository;
 import application.repository.MasterRepository;
 import application.service.MasterService;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -32,13 +32,14 @@ public class MasterServiceImpl implements MasterService {
     private final JobRepository jobRepository;
 
     @Override
+    @Transactional
     public MasterResponseDto createMaster(MasterRequestDto masterRequestDto) {
         return masterMapper.toDto(masterRepository
                 .save(masterMapper.toEntity(masterRequestDto)));
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public MasterResponseDto updateById(Long id, MasterRequestDto masterRequestDto) {
         Optional<Master> master = masterRepository.findById(id);
         if (master.isPresent()) {
@@ -49,6 +50,7 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllSuccessfulOrdersByMasterId(Long id) {
         return findByIdWithAllOrders(id)
                 .getOrders().stream()

@@ -7,9 +7,9 @@ import application.mapper.GoodMapper;
 import application.model.Good;
 import application.repository.GoodRepository;
 import application.service.GoodService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +19,7 @@ public class GoodServiceImpl implements GoodService {
     private final GoodRepository goodRepository;
 
     @Override
+    @Transactional
     public GoodResponseDto createGood(GoodRequestDto goodRequestDto) {
         return goodMapper.toDto(goodRepository.save(goodMapper.toEntity(goodRequestDto)));
     }

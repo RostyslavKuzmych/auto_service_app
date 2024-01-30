@@ -7,9 +7,9 @@ import application.mapper.CarMapper;
 import application.model.Car;
 import application.repository.CarRepository;
 import application.service.CarService;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +19,7 @@ public class CarServiceImpl implements CarService {
     private final CarMapper carMapper;
 
     @Override
+    @Transactional
     public CarResponseDto createCar(CarRequestDto carRequestDto) {
         return carMapper.toDto(carRepository.save(carMapper.toEntity(carRequestDto)));
     }

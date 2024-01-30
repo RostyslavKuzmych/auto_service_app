@@ -9,10 +9,10 @@ import application.mapper.OwnerMapper;
 import application.model.Owner;
 import application.repository.OwnerRepository;
 import application.service.OwnerService;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -23,11 +23,13 @@ public class OwnerServiceImpl implements OwnerService {
     private final OrderMapper orderMapper;
 
     @Override
+    @Transactional
     public OwnerResponseDto createOwner(OwnerRequestDto ownerRequestDto) {
         return ownerMapper.toDto(ownerRepository.save(ownerMapper.toEntity(ownerRequestDto)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllOrdersByOwnerId(Long id) {
         return findByIdWithOrders(id)
                 .getOrders().stream()

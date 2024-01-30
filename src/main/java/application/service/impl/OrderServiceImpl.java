@@ -19,13 +19,13 @@ import application.repository.MasterRepository;
 import application.repository.OrderRepository;
 import application.repository.OwnerRepository;
 import application.service.OrderService;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
