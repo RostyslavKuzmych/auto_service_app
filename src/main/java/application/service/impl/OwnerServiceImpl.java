@@ -12,6 +12,7 @@ import application.service.OwnerService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -22,11 +23,13 @@ public class OwnerServiceImpl implements OwnerService {
     private final OrderMapper orderMapper;
 
     @Override
+    @Transactional
     public OwnerResponseDto createOwner(OwnerRequestDto ownerRequestDto) {
         return ownerMapper.toDto(ownerRepository.save(ownerMapper.toEntity(ownerRequestDto)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllOrdersByOwnerId(Long id) {
         return findByIdWithOrders(id)
                 .getOrders().stream()
@@ -35,6 +38,7 @@ public class OwnerServiceImpl implements OwnerService {
     }
 
     @Override
+    @Transactional
     public OwnerResponseDto updateOwner(Long id, OwnerRequestDto ownerRequestDto) {
         Owner owner = ownerRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(EXCEPTION + id));

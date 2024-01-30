@@ -151,7 +151,7 @@ class OrderServiceImplTest {
             """)
     void addGoodToOrder_ValidOrderId_ReturnResponseDto() {
         // when
-        when(orderRepository.findByIdWithGoodsAndJobs(FIRST_ORDER_ID))
+        when(orderRepository.findOrderById(FIRST_ORDER_ID))
                 .thenReturn(Optional.of(order));
         when(goodRepository.findById(LUBRICANT_ID)).thenReturn(Optional.of(lubricant));
         when(orderRepository.save(any(Order.class))).thenReturn(order);
@@ -170,7 +170,7 @@ class OrderServiceImplTest {
             """)
     void updateOrder_ValidOrderId_ReturnResponseDto() {
         // when
-        when(orderRepository.findByIdWithGoodsAndJobs(FIRST_ORDER_ID))
+        when(orderRepository.findOrderById(FIRST_ORDER_ID))
                 .thenReturn(Optional.of(order));
         when(orderRepository.save(order.setProblemDescription(updateDto
                 .getProblemDescription()))).thenReturn(order);
@@ -181,7 +181,7 @@ class OrderServiceImplTest {
         OrderResponseDto actual = orderServiceImpl.updateOrder(updateDto, FIRST_ORDER_ID);
         assertNotNull(actual);
         assertEquals(orderResponseDto, actual);
-        verify(orderRepository, times(ONE_TIME)).findByIdWithGoodsAndJobs(FIRST_ORDER_ID);
+        verify(orderRepository, times(ONE_TIME)).findOrderById(FIRST_ORDER_ID);
         verify(orderRepository, times(ONE_TIME)).save(order);
     }
 
@@ -191,7 +191,7 @@ class OrderServiceImplTest {
             """)
     void updateOrderStatus_ValidRequestStatus_ReturnResponseDto() {
         // when
-        when(orderRepository.findByIdWithGoodsAndJobs(FIRST_ORDER_ID))
+        when(orderRepository.findOrderById(FIRST_ORDER_ID))
                 .thenReturn(Optional.of(order));
         when(orderRepository.save(order.setStatus(statusDto.getStatus())))
                 .thenReturn(order);
@@ -202,7 +202,7 @@ class OrderServiceImplTest {
                 orderServiceImpl.updateOrderStatus(FIRST_ORDER_ID, statusDto);
         assertNotNull(actual);
         assertEquals(orderResponseDto, actual);
-        verify(orderRepository, times(ONE_TIME)).findByIdWithGoodsAndJobs(FIRST_ORDER_ID);
+        verify(orderRepository, times(ONE_TIME)).findOrderById(FIRST_ORDER_ID);
         verify(orderRepository, times(ONE_TIME)).save(order);
     }
 
@@ -212,9 +212,9 @@ class OrderServiceImplTest {
             """)
     void payForOrder_ValidRequestDto_ReturnResponseDto() {
         // when
-        when(orderRepository.findByIdWithGoodsAndJobs(FIRST_ORDER_ID))
+        when(orderRepository.findOrderById(FIRST_ORDER_ID))
                 .thenReturn(Optional.of(order.setJobs(Set.of(diagnostics))));
-        when(masterRepository.findByIdWithAllOrders(STEPAN_ID))
+        when(masterRepository.findMasterById(STEPAN_ID))
                 .thenReturn(Optional.of(stepan));
         when(masterRepository.save(any(Master.class)))
                 .thenReturn(stepan);
@@ -233,7 +233,7 @@ class OrderServiceImplTest {
             """)
     void payForOrder_InvalidOrderId_ThrowException() {
         // when
-        when(orderRepository.findByIdWithGoodsAndJobs(INVALID_ORDER_ID))
+        when(orderRepository.findOrderById(INVALID_ORDER_ID))
                 .thenReturn(Optional.empty());
         Exception exception = assertThrows(
                 EntityNotFoundException.class,

@@ -66,7 +66,7 @@ class MasterRepositoryTest {
             """)
     void findByIdWithAllOrders_ValidMasterId_ReturnList() {
         Master expected = stepan;
-        Master actual = masterRepository.findByIdWithAllOrders(STEPAN_ID).orElse(null);
+        Master actual = masterRepository.findMasterById(STEPAN_ID).orElse(null);
         Assertions.assertNotNull(actual);
         EqualsBuilder.reflectionEquals(expected, actual);
     }

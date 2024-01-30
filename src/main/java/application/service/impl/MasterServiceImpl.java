@@ -11,13 +11,15 @@ import application.model.Master;
 import application.repository.JobRepository;
 import application.repository.MasterRepository;
 import application.service.MasterService;
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -30,12 +32,14 @@ public class MasterServiceImpl implements MasterService {
     private final JobRepository jobRepository;
 
     @Override
+    @Transactional
     public MasterResponseDto createMaster(MasterRequestDto masterRequestDto) {
         return masterMapper.toDto(masterRepository
                 .save(masterMapper.toEntity(masterRequestDto)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MasterResponseDto updateById(Long id, MasterRequestDto masterRequestDto) {
         Optional<Master> master = masterRepository.findById(id);
         if (master.isPresent()) {
@@ -46,6 +50,7 @@ public class MasterServiceImpl implements MasterService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<OrderResponseDto> getAllSuccessfulOrdersByMasterId(Long id) {
         return findByIdWithAllOrders(id)
                 .getOrders().stream()
@@ -60,19 +65,30 @@ public class MasterServiceImpl implements MasterService {
      * for which he has not yet received payment.
      */
     public BigDecimal getSalaryByMasterId(Long id) {
-        BigDecimal salary = findByIdWithAllOrders(id)
+        Set<Job> unpaidJobs = getUnpaidJobs(id);
+        unpaidJobs.forEach(c -> jobRepository.save(c.setStatus(Job.Status.PAID)));
+        BigDecimal priceOfJobs = getPriceOfJobs(unpaidJobs);
+        return priceOfJobs.multiply(BigDecimal.valueOf(MASTER_PERCENT));
+    }
+
+    private BigDecimal getPriceOfJobs(Set<Job> unpaidJobs) {
+        return unpaidJobs.stream()
+                .map(Job::getPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private Set<Job> getUnpaidJobs(Long id) {
+        return findByIdWithAllOrders(id)
                 .getOrders().stream()
                 .flatMap(order -> order.getJobs().stream())
                 .filter(job -> Objects.equals(job.getMaster().getId(), id))
                 .filter(job -> job.getStatus() == Job.Status.UNPAID)
-                .map(job -> jobRepository.save(job.setStatus(Job.Status.PAID)))
-                .map(Job::getPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        return salary.multiply(BigDecimal.valueOf(MASTER_PERCENT));
+                .collect(Collectors.toSet());
     }
 
     private Master findByIdWithAllOrders(Long id) {
-        return masterRepository.findByIdWithAllOrders(id).orElseThrow(()
+        return masterRepository.findMasterById(id).orElseThrow(()
                 -> new EntityNotFoundException(EXCEPTION + id));
     }
+
 }

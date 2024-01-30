@@ -10,6 +10,7 @@ import application.repository.JobRepository;
 import application.service.JobService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,11 +20,13 @@ public class JobServiceImpl implements JobService {
     private final JobMapper jobMapper;
 
     @Override
+    @Transactional
     public JobResponseDto createJob(JobRequestDto jobRequestDto) {
         return jobMapper.toDto(jobRepository.save(jobMapper.toEntity(jobRequestDto)));
     }
 
     @Override
+    @Transactional
     public JobResponseDto updateJob(Long id, JobRequestDto jobRequestDto) {
         if (jobRepository.findById(id).isPresent()) {
             Job job = jobMapper.toEntity(jobRequestDto).setId(id);
@@ -33,6 +36,7 @@ public class JobServiceImpl implements JobService {
     }
 
     @Override
+    @Transactional
     public JobResponseDto updateJobStatus(Long id, JobRequestStatusDto status) {
         Job job = findById(id).setStatus(status.getStatus());
         return jobMapper.toDto(jobRepository.save(job));
